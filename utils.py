@@ -13,19 +13,10 @@ from Augment import resample_random
 from module import contrastive_loss
 
 def get_data(data_name, uci_test_group=None):
-    base_path = '/kaggle/input/uci-har-dataset/UCI HAR Dataset/'
-    x_train_raw = np.loadtxt(base_path + 'train/X_train.txt')
-    y_train_raw = np.loadtxt(base_path + 'train/y_train.txt')
-    sub_train_raw = np.loadtxt(base_path + 'train/subject_train.txt')
-    
-    x_test_raw = np.loadtxt(base_path + 'test/X_test.txt')
-    y_test_raw = np.loadtxt(base_path + 'test/y_test.txt')
-    sub_test_raw = np.loadtxt(base_path + 'test/subject_test.txt')
-
-    x_data = np.concatenate((x_train_raw, x_test_raw), axis=0)
-    y_data = np.concatenate((y_train_raw, y_test_raw), axis=0)
-    subjects = np.concatenate((sub_train_raw, sub_test_raw), axis=0)
-
+    NPY_PATH = "/kaggle/working/"
+    x_data = np.load(NPY_PATH + 'UCI_X.npy')     # (10299, 128, 9)
+    y_data = np.load(NPY_PATH + 'UCI_y.npy')     # (10299, 6)
+    subjects = np.load(NPY_PATH + 'UCI_sub.npy') # (10299,)
     y_data = y_data - 1
 
     test_groups = {
