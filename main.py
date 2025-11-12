@@ -71,11 +71,6 @@ if __name__ == '__main__':
     print(f"\nAverage F1: {avg_f1 * 100:.2f}%")
     avg_row = pd.DataFrame([{'group': 'Average', 'f1_score': avg_f1}])
     final_df = pd.concat([df_results, avg_row], ignore_index=True)
-    final.to_csv("results.csv", index=False)
-    
-
-
-
-
+    final_df.to_csv("results.csv", index=False)
 
 
