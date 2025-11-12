@@ -15,7 +15,7 @@ from tensorflow.keras.utils import to_categorical
 def get_data(data_name, uci_test_group=None):
     NPY_PATH = "/kaggle/working/"
     x_data = np.load(NPY_PATH + 'UCI_X.npy')     # (10299, 128, 9)
-    y_data = np.load(NPY_PATH + 'UCI_y.npy')     # (10299, 6)
+    y_data = np.load(NPY_PATH + 'UCI_y.npy')     # (10299, )
     subjects = np.load(NPY_PATH + 'UCI_sub.npy') # (10299,)
     y_data = y_data - 1
 
@@ -31,7 +31,7 @@ def get_data(data_name, uci_test_group=None):
         9: [4, 19, 22, 26, 27, 30],
         10: [7, 8, 11, 15, 20, 21]
     }
-
+    test_group_def = test_groups[uci_test_group]
     test_mask = np.isin(subjects, test_group_def)
     train_mask = ~test_mask
     
