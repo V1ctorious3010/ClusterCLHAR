@@ -13,8 +13,6 @@ from Augment import resample_random
 from module import contrastive_loss
 
 def get_data(data_name, uci_test_group=None):
-    if uci_test_group is None or uci_test_group not in [1, 2, 3, 4, 5]:
-        raise ValueError("Vui lòng cung cấp uci_test_group hợp lệ (1, 2, 3, 4, hoặc 5) cho dataset 'ucihar'.")
     base_path = '/kaggle/input/uci-har-dataset/UCI HAR Dataset'
     x_train_raw = np.loadtxt(base_path + 'train/X_train.txt')
     y_train_raw = np.loadtxt(base_path + 'train/y_train.txt')
