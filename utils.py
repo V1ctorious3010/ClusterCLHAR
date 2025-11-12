@@ -78,5 +78,5 @@ def train(model,x_data,args):
             loss_epoch.append(loss)
         print("epoch{}===>loss:{}".format(epoch + 1, np.mean(loss_epoch)))
         if epoch > epochs//2 and np.mean(loss_epoch) < cur_loss:
-            tf.keras.models.save_model(model,'contrastive_model/'+'{}_cluster_{}_batchsize_{}_epoch_{}'.format(args.dataset,args.cluster,args.batch_size,args.epoch))
+            tf.keras.models.save_model(model,'contrastive_model/'+'{}_cluster_{}_batchsize_{}_epoch_{}.keras'.format(args.dataset,args.cluster,args.batch_size,args.epoch))
             cur_loss = np.mean(loss_epoch)
