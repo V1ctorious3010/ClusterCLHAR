@@ -5,23 +5,51 @@ from sklearnex import patch_sklearn
 from Augment import resample_random
 from module import contrastive_loss
 
-def get_data(data_name):
-    if data_name=='ucihar':
-        x_data = np.load('datasets/UCI_X.npy')
-        y_data = np.load('datasets/UCI_Y.npy')
-    elif data_name=='motion':
-        x_data = np.load('datasets/Motion_X.npy')
-        y_data = np.load('datasets/Motion_Y.npy')
-    elif data_name == 'uschad':
-        x_data = np.load('datasets/USCHAD_X.npy')
-        y_data = np.load('datasets/USCHAD_Y.npy')
-    else:
-        raise ValueError("The dataset name is not valid.")
+import numpy as np
+import tensorflow as tf
+from sklearn.cluster import Birch,KMeans
+from sklearnex import patch_sklearn
+from Augment import resample_random
+from module import contrastive_loss
+
+def get_data(data_name, uci_test_group=None):
+    if uci_test_group is None or uci_test_group not in [1, 2, 3, 4, 5]:
+        raise ValueError("Vui lòng cung cấp uci_test_group hợp lệ (1, 2, 3, 4, hoặc 5) cho dataset 'ucihar'.")
+    base_path = '/kaggle/input/uci-har-dataset/UCI HAR Dataset'
+    x_train_raw = np.loadtxt(base_path + 'train/X_train.txt')
+    y_train_raw = np.loadtxt(base_path + 'train/y_train.txt')
+    sub_train_raw = np.loadtxt(base_path + 'train/subject_train.txt')
+    
+    x_test_raw = np.loadtxt(base_path + 'test/X_test.txt')
+    y_test_raw = np.loadtxt(base_path + 'test/y_test.txt')
+    sub_test_raw = np.loadtxt(base_path + 'test/subject_test.txt')
+
+    x_data = np.concatenate((x_train_raw, x_test_raw), axis=0)
+    y_data = np.concatenate((y_train_raw, y_test_raw), axis=0)
+    subjects = np.concatenate((sub_train_raw, sub_test_raw), axis=0)
+
+    y_data = y_data - 1
+
+    test_groups = {
+        1: (1, 6),  
+        2: (7, 12),
+        3: (13, 18),
+        4: (19, 24),
+        5: (25, 30)
+    }
+
+    min_sub, max_sub = test_groups[uci_test_group]
+    test_mask = (subjects >= min_sub) & (subjects <= max_sub)
+    train_mask = ~test_mask
+    
+    x_train, y_train = x_data[train_mask], y_data[train_mask]
+    x_test, y_test = x_data[test_mask], y_data[test_mask]
+
     np.random.seed(888)
-    np.random.shuffle(x_data)
-    np.random.seed(888)
-    np.random.shuffle(y_data)
-    return x_data,y_data
+    p_train = np.random.permutation(len(x_train))
+    x_train, y_train = x_train[p_train], y_train[p_train]   
+    return (x_train, y_train), (x_test, y_test)
+
 
 def get_cluster(cluster_name,cluster_num):
     if cluster_name == 'birch':
