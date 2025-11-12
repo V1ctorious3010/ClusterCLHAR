@@ -13,7 +13,7 @@ from Augment import resample_random
 from module import contrastive_loss
 
 def get_data(data_name, uci_test_group=None):
-    base_path = '/kaggle/input/uci-har-dataset/UCI HAR Dataset'
+    base_path = '/kaggle/input/uci-har-dataset/UCI HAR Dataset/'
     x_train_raw = np.loadtxt(base_path + 'train/X_train.txt')
     y_train_raw = np.loadtxt(base_path + 'train/y_train.txt')
     sub_train_raw = np.loadtxt(base_path + 'train/subject_train.txt')
