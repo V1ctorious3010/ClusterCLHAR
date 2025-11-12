@@ -4,6 +4,7 @@ import argparse
 import tensorflow as tf
 import numpy as np
 from sklearn.metrics import f1_score
+import csv
 parser = argparse.ArgumentParser(description='training setup')
 
 parser.add_argument('--batch_size', type=int, default=1024, help='batch size of training')
@@ -44,12 +45,14 @@ def linear_evaluation(backbone, X_train, y_train, X_test, y_test, n_outputs, arg
     y_true = np.argmax(y_test, axis=1)
 
     f1 = f1_score(y_true, y_pred, average='macro')
+    print(f"Result:")
     print(f"Test Accuracy: {accuracy * 100:.2f}%")
     print(f"Test F1-score (Macro): {f1 * 100:.2f}%")
+    return f1
     
 if __name__ == '__main__':
     args = parser.parse_args()
-
+    all_results = []
     for group in range(1, 1):
         x_train, y_train, x_test, y_test  = get_data(args.dataset, group)
         n_timesteps, n_features, n_outputs = x_train.shape[1], x_train.shape[2], y_train.shape[1]
@@ -59,5 +62,9 @@ if __name__ == '__main__':
         print("\n--- Starting Unsupervised Pre-training ---")
         train(model,x_train,args)
         print("\n--- Starting Linear Evaluation ---")
-        linear_evaluation(backbone, x_train, y_train, x_test, y_test, n_outputs, args)
+        f1_score = linear_evaluation(backbone, x_train, y_train, x_test, y_test, n_outputs, args)
+        all_results.append({'group': group, 'f1_score': f1_score})
+        df_results = pd.DataFrame(all_results)
+        df_results.to_csv("results.csv", index=False)
+    
 
