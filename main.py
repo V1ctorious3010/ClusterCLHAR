@@ -50,7 +50,7 @@ def linear_evaluation(backbone, X_train, y_train, X_test, y_test, n_outputs, arg
 if __name__ == '__main__':
     args = parser.parse_args()
 
-    for group in range(1, 6):
+    for group in range(1, 1):
         x_train, y_train, x_test, y_test  = get_data(args.dataset, group)
         n_timesteps, n_features, n_outputs = x_train.shape[1], x_train.shape[2], y_train.shape[1]
     
@@ -60,3 +60,4 @@ if __name__ == '__main__':
         train(model,x_train,args)
         print("\n--- Starting Linear Evaluation ---")
         linear_evaluation(backbone, x_train, y_train, x_test, y_test, n_outputs, args)
+
