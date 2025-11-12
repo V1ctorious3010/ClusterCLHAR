@@ -46,7 +46,7 @@ def get_data(data_name, uci_test_group=None):
     np.random.seed(888)
     p_train = np.random.permutation(len(x_train))
     x_train, y_train = x_train[p_train], y_train[p_train]   
-    return (x_train, y_train), (x_test, y_test)
+    return x_train, y_train, x_test, y_test
 
 
 def get_cluster(cluster_name,cluster_num):
