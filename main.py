@@ -53,7 +53,7 @@ def linear_evaluation(backbone, X_train, y_train, X_test, y_test, n_outputs, arg
 if __name__ == '__main__':
     args = parser.parse_args()
     all_results = []
-    for group in range(1, 2):
+    for group in range(1, 11):
         x_train, y_train, x_test, y_test  = get_data(args.dataset, group)
         print(f"DEBUG: x_train.shape = {x_train.shape}")
         print(f"DEBUG: y_train.shape = {y_train.shape}")
@@ -66,10 +66,14 @@ if __name__ == '__main__':
         print("\n--- Starting Linear Evaluation ---")
         _f1 = linear_evaluation(backbone, x_train, y_train, x_test, y_test, n_outputs, args)
         all_results.append({'group': group, 'f1_score': _f1})
-        
     df_results = pd.DataFrame(all_results)
-    df_results.to_csv("results.csv", index=False)
+    avg_f1 = df_results['f1_score'].mean()
+    print(f"\nAverage F1: {avg_f1 * 100:.2f}%")
+    avg_row = pd.DataFrame([{'group': 'Average', 'f1_score': avg_f1}])
+    final_df = pd.concat([df_results, avg_row], ignore_index=True)
+    final.to_csv("results.csv", index=False)
     
+
 
 
 
