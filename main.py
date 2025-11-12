@@ -5,7 +5,6 @@ import tensorflow as tf
 import numpy as np
 from sklearn.metrics import f1_score
 import pandas as pd
-import csv
 parser = argparse.ArgumentParser(description='training setup')
 
 parser.add_argument('--batch_size', type=int, default=1024, help='batch size of training')
@@ -63,12 +62,13 @@ if __name__ == '__main__':
         print("\n--- Starting Unsupervised Pre-training ---")
         train(model,x_train,args)
         print("\n--- Starting Linear Evaluation ---")
-        f1 = linear_evaluation(backbone, x_train, y_train, x_test, y_test, n_outputs, args)
-        all_results.append({'group': group, 'f1_score': f1})
+        _f1 = linear_evaluation(backbone, x_train, y_train, x_test, y_test, n_outputs, args)
+        all_results.append({'group': group, 'f1_score': _f1})
         
     df_results = pd.DataFrame(all_results)
     df_results.to_csv("results.csv", index=False)
     
+
 
 
 
