@@ -11,7 +11,7 @@ from sklearn.cluster import Birch,KMeans
 from sklearnex import patch_sklearn
 from Augment import resample_random
 from module import contrastive_loss
-
+from tensorflow.keras.utils import to_categorical
 def get_data(data_name, uci_test_group=None):
     NPY_PATH = "/kaggle/working/"
     x_data = np.load(NPY_PATH + 'UCI_X.npy')     # (10299, 128, 9)
@@ -36,7 +36,9 @@ def get_data(data_name, uci_test_group=None):
 
     np.random.seed(888)
     p_train = np.random.permutation(len(x_train))
-    x_train, y_train = x_train[p_train], y_train[p_train]   
+    x_train, y_train = x_train[p_train], y_train[p_train]
+    y_train = to_categorical(y_train, num_classes=6)
+    y_test = to_categorical(y_test, num_classes=6)
     return x_train, y_train, x_test, y_test
 
 
