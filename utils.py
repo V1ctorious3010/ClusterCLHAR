@@ -20,15 +20,19 @@ def get_data(data_name, uci_test_group=None):
     y_data = y_data - 1
 
     test_groups = {
-        1: (1, 6),  
-        2: (7, 12),
-        3: (13, 18),
+        1: [1, 2, 3, 4, 5, 6],
+        2: [7, 8, 9, 10, 11, 12],
+        3: [13, 14, 15, 16, 17, 18],
         4: (19, 24),
-        5: (25, 30)
+        5: (25, 30),
+        6: [9, 10, 16, 18, 24, 28],
+        7: [1, 5, 13, 17, 25, 29],
+        8: [2, 3, 6, 12, 14, 23],
+        9: [4, 19, 22, 26, 27, 30],
+        10: [7, 8, 11, 15, 20, 21]
     }
 
-    min_sub, max_sub = test_groups[uci_test_group]
-    test_mask = (subjects >= min_sub) & (subjects <= max_sub)
+    test_mask = np.isin(subjects, test_group_def)
     train_mask = ~test_mask
     
     x_train, y_train = x_data[train_mask], y_data[train_mask]
