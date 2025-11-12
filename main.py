@@ -4,6 +4,7 @@ import argparse
 import tensorflow as tf
 import numpy as np
 from sklearn.metrics import f1_score
+import pandas as pd
 import csv
 parser = argparse.ArgumentParser(description='training setup')
 
@@ -67,4 +68,5 @@ if __name__ == '__main__':
         df_results = pd.DataFrame(all_results)
         df_results.to_csv("results.csv", index=False)
     
+
 
