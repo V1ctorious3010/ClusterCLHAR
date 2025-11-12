@@ -5,6 +5,9 @@ import tensorflow as tf
 import numpy as np
 from sklearn.metrics import f1_score
 import pandas as pd
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
+from sklearn.model_selection import train_test_split
+
 parser = argparse.ArgumentParser(description='training setup')
 
 parser.add_argument('--batch_size', type=int, default=1024, help='batch size of training')
@@ -30,13 +33,33 @@ def linear_evaluation(backbone, X_train, y_train, X_test, y_test, n_outputs, arg
         loss='categorical_crossentropy',
         metrics=['accuracy']
     )
+    y_train_1d_for_split = np.argmax(y_train, axis=1)
+    X_train_sub, X_val, y_train_sub, y_val = train_test_split(
+        X_train, y_train, test_size=0.1, random_state=42, stratify=y_train_1d_for_split
+    )
+    checkpoint_filepath = '/kaggle/working/best_linear_model_fold.keras'
+    cp_callback = ModelCheckpoint(
+        filepath=checkpoint_filepath,
+        monitor='val_loss',
+        save_best_only=True,
+        mode='min',
+        verbose=0
+    )
+    es_callback = EarlyStopping(
+        monitor='val_loss',
+        patience=30,
+        mode='min',
+        restore_best_weights=True
+    )
     eval_model.fit(
-        X_train, y_train,
+        X_train_sub, y_train_sub,
         batch_size=args.batch_size,
-        epochs=50,
-        validation_data=(X_test, y_test),
+        epochs=300,
+        validation_data=(X_val, y_val),
+        callbacks=[cp_callback, es_callback],
         verbose=2
     )
+    
     print("\n--- Test Set Evaluation Results ---")
     loss, accuracy = eval_model.evaluate(X_test, y_test, verbose=0)
     
@@ -72,5 +95,6 @@ if __name__ == '__main__':
     avg_row = pd.DataFrame([{'group': 'Average', 'f1_score': avg_f1}])
     final_df = pd.concat([df_results, avg_row], ignore_index=True)
     final_df.to_csv("results.csv", index=False)
+
 
 
