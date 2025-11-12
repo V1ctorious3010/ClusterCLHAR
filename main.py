@@ -55,6 +55,8 @@ if __name__ == '__main__':
     all_results = []
     for group in range(1, 2):
         x_train, y_train, x_test, y_test  = get_data(args.dataset, group)
+        print(f"DEBUG: x_train.shape = {x_train.shape}")
+        print(f"DEBUG: y_train.shape = {y_train.shape}")
         n_timesteps, n_features, n_outputs = x_train.shape[1], x_train.shape[2], y_train.shape[1]
     
         backbone = get_backbone(args.backbone,n_timesteps,n_features)
@@ -68,6 +70,7 @@ if __name__ == '__main__':
     df_results = pd.DataFrame(all_results)
     df_results.to_csv("results.csv", index=False)
     
+
 
 
 
