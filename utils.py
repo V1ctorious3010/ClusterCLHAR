@@ -37,13 +37,15 @@ def get_data(data_name, uci_test_group=None):
     
     x_train, y_train = x_data[train_mask], y_data[train_mask]
     x_test, y_test = x_data[test_mask], y_data[test_mask]
+    subjects_train = subjects[train_mask]
 
     np.random.seed(888)
     p_train = np.random.permutation(len(x_train))
     x_train, y_train = x_train[p_train], y_train[p_train]
+    subjects_train = subjects_train[p_train]
     y_train = to_categorical(y_train, num_classes=6)
     y_test = to_categorical(y_test, num_classes=6)
-    return x_train, y_train, x_test, y_test
+    return x_train, y_train, x_test, y_test, subjects_train
 
 
 def get_cluster(cluster_name,cluster_num):
