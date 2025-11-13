@@ -28,10 +28,11 @@ def linear_evaluation(backbone, X_train, y_train, X_test, y_test, subjects_train
         backbone,
         tf.keras.layers.Dense(n_outputs, activation='softmax')
     ])
+    f1_metric = tf.keras.metrics.F1Score(average='macro', name='f1_macro')
     eval_model.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=args.lr),
         loss='categorical_crossentropy',
-        metrics=['accuracy']
+        metrics=['accuracy', f1_metric]
     )
     gss = GroupShuffleSplit(n_splits=1, test_size=0.1, random_state=42)
     y_train_1d_for_split = np.argmax(y_train, axis=1)
@@ -43,15 +44,15 @@ def linear_evaluation(backbone, X_train, y_train, X_test, y_test, subjects_train
     checkpoint_filepath = '/kaggle/working/best_linear_model_fold.keras'
     cp_callback = ModelCheckpoint(
         filepath=checkpoint_filepath,
-        monitor='val_loss',
+        monitor='val_f1_macro',
         save_best_only=True,
-        mode='min',
+        mode='max',
         verbose=0
     )
     es_callback = EarlyStopping(
-        monitor='val_loss',
+        monitor='val_f1_macro',
         patience=30,
-        mode='min',
+        mode='max',
         restore_best_weights=True
     )
     eval_model.fit(
@@ -64,7 +65,7 @@ def linear_evaluation(backbone, X_train, y_train, X_test, y_test, subjects_train
     )
     
     print("\n--- Test Set Evaluation Results ---")
-    loss, accuracy = eval_model.evaluate(X_test, y_test, verbose=0)
+    loss, accuracy, f1_macro_test_keras = eval_model.evaluate(X_test, y_test, verbose=0)
     
     y_pred_probs = eval_model.predict(X_test)
     y_pred = np.argmax(y_pred_probs, axis=1)
@@ -98,6 +99,7 @@ if __name__ == '__main__':
     avg_row = pd.DataFrame([{'group': 'Average', 'f1_score': avg_f1}])
     final_df = pd.concat([df_results, avg_row], ignore_index=True)
     final_df.to_csv("results.csv", index=False)
+
 
 
 
