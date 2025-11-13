@@ -6,7 +6,7 @@ import numpy as np
 from sklearn.metrics import f1_score
 import pandas as pd
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GroupShuffleSplit
 
 parser = argparse.ArgumentParser(description='training setup')
 
@@ -33,10 +33,13 @@ def linear_evaluation(backbone, X_train, y_train, X_test, y_test, n_outputs, arg
         loss='categorical_crossentropy',
         metrics=['accuracy']
     )
+    gss = GroupShuffleSplit(n_splits=1, test_size=0.1, random_state=42)
     y_train_1d_for_split = np.argmax(y_train, axis=1)
-    X_train_sub, X_val, y_train_sub, y_val = train_test_split(
-        X_train, y_train, test_size=0.1, random_state=42, stratify=y_train_1d_for_split
-    )
+    train_sub_idx, val_idx = next(gss.split(X_train, y_train, groups=subjects_train))
+    X_train_sub, y_train_sub = X_train[train_sub_idx], y_train[train_sub_idx]
+    X_val, y_val = X_train[val_idx], y_train[val_idx]
+    
+    val_subjects = np.unique(subjects_train[val_idx])
     checkpoint_filepath = '/kaggle/working/best_linear_model_fold.keras'
     cp_callback = ModelCheckpoint(
         filepath=checkpoint_filepath,
@@ -77,7 +80,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     all_results = []
     for group in range(1, 11):
-        x_train, y_train, x_test, y_test  = get_data(args.dataset, group)
+        x_train, y_train, x_test, y_test, subjects_train  = get_data(args.dataset, group)
         print(f"DEBUG: x_train.shape = {x_train.shape}")
         print(f"DEBUG: y_train.shape = {y_train.shape}")
         n_timesteps, n_features, n_outputs = x_train.shape[1], x_train.shape[2], y_train.shape[1]
@@ -87,7 +90,7 @@ if __name__ == '__main__':
         print("\n--- Starting Unsupervised Pre-training ---")
         train(model,x_train,args)
         print("\n--- Starting Linear Evaluation ---")
-        _f1 = linear_evaluation(backbone, x_train, y_train, x_test, y_test, n_outputs, args)
+        _f1 = linear_evaluation(backbone, x_train, y_train, x_test, y_test, subjects_train, n_outputs, args)
         all_results.append({'group': group, 'f1_score': _f1})
     df_results = pd.DataFrame(all_results)
     avg_f1 = df_results['f1_score'].mean()
@@ -95,7 +98,4 @@ if __name__ == '__main__':
     avg_row = pd.DataFrame([{'group': 'Average', 'f1_score': avg_f1}])
     final_df = pd.concat([df_results, avg_row], ignore_index=True)
     final_df.to_csv("results.csv", index=False)
-
-
-
 
