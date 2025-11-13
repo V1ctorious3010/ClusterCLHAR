@@ -20,7 +20,7 @@ parser.add_argument('--p1', type=int, default=96, help='projection head dimensio
 parser.add_argument('--p2', type=int, default=96, help='projection head dimension')
 parser.add_argument('--p3', type=int, default=96, help='projection head dimension')
 parser.add_argument('--cluster', type=str, default='birch', choices=['birch', 'kmeans'], help='cluster methods')
-parser.add_argument('--cluster_num', type=int, default=8, help='cluster number')
+parser.add_argument('--cluster_num', type=int, default=6, help='cluster number')
 def linear_evaluation(backbone, X_train, y_train, X_test, y_test, subjects_train, n_outputs, args):
     backbone.trainable = False
     eval_model = tf.keras.models.Sequential([
@@ -99,6 +99,7 @@ if __name__ == '__main__':
     avg_row = pd.DataFrame([{'group': 'Average', 'f1_score': avg_f1}])
     final_df = pd.concat([df_results, avg_row], ignore_index=True)
     final_df.to_csv("results.csv", index=False)
+
 
 
 
